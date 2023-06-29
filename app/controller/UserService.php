@@ -21,8 +21,11 @@ class UserService extends BaseController
             return -2;
 
         try {
-            $pref = UserPreference::find($data['phone'])->toJson();
-            return $pref;
+            $user = UserPreference::find($data['phone']);
+            $user->theme = Security::aesEncrypt($user->theme, $aesKey);
+            $user->band = Security::aesEncrypt($user->band, $aesKey);
+            $user->char_pref = Security::aesEncrypt($user->char_pref, $aesKey);
+            return $user->toJson();
         } catch (\Throwable $th) {
             return -3;
         }
@@ -43,9 +46,9 @@ class UserService extends BaseController
         $user = new UserPreference;
         $user->phone = $data['phone'];
         $user->name = $data['name'];
-        $user->theme = $data['theme'];
-        $user->band = $data['band'];
-        $user->char_pref = $data['char_pref'];
+        $user->theme = Security::aesDecrypt($data['theme'], $aesKey);
+        $user->band = Security::aesDecrypt($data['band'], $aesKey);
+        $user->char_pref = Security::aesDecrypt($data['char_pref'], $aesKey);
         $user->replace()->save();
         return 'OK';
     }

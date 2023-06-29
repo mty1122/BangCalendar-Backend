@@ -13,11 +13,12 @@ class Login extends BaseController
         $post = file_get_contents('php://input');
         $data = json_decode($post, true);
         $code = strval(cache('s' . $data['phone']));
-        if (strcmp($code, $data['smsCode']) != 0)
-            return 'FAIL';
         $aesKey = Security::rsaDecrypt($data['key']);
         if (strlen($aesKey) != 16)
             return 'FAIL';
+        $post_code = Security::aesDecrypt($data['smsCode'], $aesKey);
+        if (strcmp($code, $post_code) != 0)
+            return 'FAIL';    
         cache('k' . $data['phone'], base64_encode($aesKey), 0);
         return 'OK';    
     }
