@@ -13,8 +13,8 @@ class Index extends BaseController
     public function update()
     {
         return json_encode([
-            'versionCode' => 19,
-            'versionName' => '1.5.8'
+            'versionCode' => 23,
+            'versionName' => '1.6.3'
         ]);
     }
 }

@@ -6,8 +6,8 @@ Route::get('update', 'index/update');
 
 Route::post('login', 'login/index');
 
-Route::post('sms', 'login/sendsms');
+Route::post('mail', 'login/sendmail');
 
-Route::post('get', 'userservice/getuser');
+Route::post('get', 'user_service/getuser');
 
-Route::post('set', 'userservice/setuser');
+Route::post('set', 'user_service/setuser');

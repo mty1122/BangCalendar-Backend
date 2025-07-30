@@ -12,44 +12,63 @@ class UserService extends BaseController
         $post = file_get_contents('php://input');
         $data = json_decode($post, true);
 
-        $aesKey = base64_decode(cache('k' . $data['phone']));
+        $aesKey = base64_decode(cache('k' . $data['mail']));
         if (strlen($aesKey) != 16)
-            return -1;
+            return json([
+                'code' => 500,
+                'data' => null
+            ]);
 
         $requestCode = Security::aesDecrypt($data['requestCode'], $aesKey);
-        if (strcmp($requestCode, $data['phone']) != 0)
-            return -2;
+        if (strcmp($requestCode, $data['mail']) != 0)
+            return json([
+                'code' => 400,
+                'data' => null
+            ]);
 
         try {
-            $user = UserPreference::find($data['phone']);
-            $user->theme = Security::aesEncrypt($user->theme, $aesKey);
-            $user->band = Security::aesEncrypt($user->band, $aesKey);
-            $user->char_pref = Security::aesEncrypt($user->char_pref, $aesKey);
-            return $user->toJson();
+            $user = UserPreference::find($data['mail']);
+            if ($user == null) return json([
+                'code' => 404,
+                'data' => null
+            ]);
+            return json([
+                'code' => 200,
+                'data' => [
+                    'mail' => $user->mail,
+                    'name' => $user->name,
+                    'theme' => Security::aesEncrypt($user->theme, $aesKey),
+                    'band' => Security::aesEncrypt($user->band, $aesKey),
+                    'char_pref' => Security::aesEncrypt($user->char_pref, $aesKey),
+                ]
+            ]);
         } catch (\Throwable $th) {
-            return -3;
+            return json([
+                'code' => 500,
+                'data' => null
+            ]);
         }
     }
 
-    public function setUser() 
+    public function setUser(): int
     {
         $post = file_get_contents('php://input');
         $data = json_decode($post, true);
 
-        $aesKey = base64_decode(cache('k' . $data['phone']));
+        $aesKey = base64_decode(cache('k' . $data['mail']));
         if (strlen($aesKey) != 16)
-            return 'FAIL';
+            return 500;
         $requestCode = Security::aesDecrypt($data['requestCode'], $aesKey);
-        if (strcmp($requestCode, $data['phone']) != 0)
-            return 'FAIL';
+        if (strcmp($requestCode, $data['mail']) != 0)
+            return 400;
 
         $user = new UserPreference;
-        $user->phone = $data['phone'];
+        $user->mail = $data['mail'];
         $user->name = $data['name'];
         $user->theme = Security::aesDecrypt($data['theme'], $aesKey);
         $user->band = Security::aesDecrypt($data['band'], $aesKey);
         $user->char_pref = Security::aesDecrypt($data['char_pref'], $aesKey);
         $user->replace()->save();
-        return 'OK';
+        return 200;
     }
 }

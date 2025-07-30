@@ -6,7 +6,7 @@
 
 return [
     // 默认缓存驱动
-    'default' => env('cache.driver', 'file'),
+    'default' => 'redis',
 
     // 缓存连接方式配置
     'stores'  => [
@@ -24,6 +24,17 @@ return [
             // 序列化机制 例如 ['serialize', 'unserialize']
             'serialize'  => [],
         ],
-        // 更多的缓存连接
+
+        'redis' => [
+            'type'     => 'redis',
+            'host'     => '127.0.0.1',
+            'port'     => 6379,
+            'password' => '', // 有密码就填，没有就留空
+            'select'   => 0,   // Redis 库编号，默认0
+            'timeout'  => 0,
+            'expire'   => 0,
+            'prefix'   => 'bc:', // 缓存前缀，可选
+            'serialize'=> [],     // 建议使用默认序列化
+        ],
     ],
 ];

@@ -9,14 +9,14 @@ class UserPreference extends Model
     protected $table = 'user_preference';
 
     // 主键
-    protected $pk = 'phone';
+    protected $pk = 'mail';
     
     // 数据库连接
     protected $connection = 'mysql';
 
     // 字段
     protected $schema = [
-        'phone' => 'char',
+        'mail' => 'char',
         'name' => 'varchar',
         'theme' => 'varchar',
         'band' => 'varchar',
